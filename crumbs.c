@@ -115,9 +115,26 @@ cr_context* cr_create_context()
         return NULL;
     }
 
-    ctx->key_states = SDL_GetKeyboardState(NULL);
+    int len = 0;
+    ctx->key_states = SDL_GetKeyboardState(&len);
 
+    // The SDL_SCANCODE_RGUI constant currently has a value of 231
+    // as of writing this code. We may not need to handle that many
+    // keys, but we require it just in case.
+    if (len < SDL_SCANCODE_RGUI)
+    {
+        SDL_DestroyRenderer(ctx->renderer);
+        SDL_DestroyWindow(ctx->window);
+        free(ctx);
+        return NULL;
+    }
+
+    ctx->ticks = 0;
     ctx->done = 0;
+
+    ctx->tmp_rect = NULL;
+    ctx->tmp_entity = NULL;
+    ctx->tmp_atlas = NULL;
 
     return ctx;
 }
@@ -137,6 +154,56 @@ void cr_destroy_context(cr_context* ctx)
 const char* cr_get_error()
 {
     return SDL_GetError();
+}
+
+void cr_begin_frame(cr_context* ctx)
+{
+    ctx->ticks = SDL_GetTicks();
+}
+
+void cr_handle_events(cr_context* ctx)
+{
+    while (SDL_PollEvent(&(ctx->event)))
+    {
+        if (ctx->event.type == SDL_QUIT)
+        {
+            ctx->done = 1;
+        }
+    }
+}
+
+void cr_render(cr_context* ctx)
+{
+    // NOTE: This is an example of drawing a filled rectangle
+    // using SDL.
+    // SDL_SetRenderDrawColor(renderer, 40, 200, 120, 255);
+    // SDL_RenderFillRect(renderer, &rect);
+
+    // Set the color to black.
+    SDL_SetRenderDrawColor(ctx->renderer, 0, 0, 0, 255);
+
+    // Remove existing graphics data.
+    SDL_RenderClear(ctx->renderer);
+
+    // TEMP: render a PNG image.
+    SDL_RenderCopy(ctx->renderer, ctx->tmp_entity, NULL, ctx->tmp_rect);
+
+    // TEMP: render some static text.
+    cr_render_text(ctx, ctx->tmp_atlas, "Hello, World!", 2, 2);
+
+    // Render the graphics to the screen.
+    SDL_RenderPresent(ctx->renderer);
+}
+
+void cr_end_frame(cr_context* ctx)
+{
+    // The target framerate is 60.
+    Uint32 target = 1000 / 60;
+
+    if (target > SDL_GetTicks() - ctx->ticks)
+    {
+        SDL_Delay(target - (SDL_GetTicks() - ctx->ticks));
+    }
 }
 
 cr_texture* cr_load_image(cr_context* ctx, const char* path)
@@ -216,12 +283,6 @@ int cr_create_glyph_image(cr_context* ctx, cr_font* font, char c, cr_glyph* g)
     SDL_FreeSurface(sur);
 
     return 1;
-}
-
-void cr_destroy_glyph(cr_glyph* glyph)
-{
-    cr_destroy_image(glyph->img);
-    free(glyph);
 }
 
 cr_glyph* cr_create_font_atlas(cr_context* ctx, cr_font* font)

@@ -1,10 +1,16 @@
 #include <stdio.h>
 #include "crumbs.h"
 
+// TODO:
+// entity list
+// input handler interface
+// asset loader interface
+// collision detection
+// menus
+// sound
+
 int main(int argc, char** argv)
 {
-    printf("Hello, World!\n");
-
     if (!cr_init())
     {
         fprintf(stderr, "failed to initialize crumbs\n");
@@ -26,12 +32,6 @@ int main(int argc, char** argv)
     rect.x = 32;
     rect.y = 32;
 
-    // NOTE: for movement, typically use key states
-    // SDL_GetKeyboardState(NULL);
-
-    // TODO:
-    // regulate framerate
-
     cr_texture* person_tex = cr_load_image(ctx, "assets/character.png");
     if (!person_tex)
     {
@@ -40,6 +40,9 @@ int main(int argc, char** argv)
         cr_terminate();
         return 1;
     }
+
+    ctx->tmp_rect = &rect;
+    ctx->tmp_entity = person_tex;
 
     cr_font* font = cr_load_font("assets/DroidSansMono.ttf", 12);
     if (!font)
@@ -62,10 +65,10 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    ctx->tmp_atlas = atlas;
+
     // Loada sound effect.
-    // Mix_Chunk* pop_sound = Mix_LoadWAV("uh.ogg");
-    // Mix_Chunk* pop2_sound = Mix_LoadWAV("pop2.ogg");
-    // Mix_Chunk* pop3_sound = Mix_LoadWAV("pop3.ogg");
+    // Mix_Chunk* pop_sound = Mix_LoadWAV("pop.ogg");
     // if (!pop_sound)
     // {
     //     fprintf(stderr, "failed to load sound effect. %s\n", SDL_GetError());
@@ -75,8 +78,6 @@ int main(int argc, char** argv)
     // }
 
     // int m_pressed = 0;
-    // int n_pressed = 0;
-    // int b_pressed = 0;
 
     int left_pressed = 0;
     int right_pressed = 0;
@@ -88,14 +89,17 @@ int main(int argc, char** argv)
     // main loop
     while (!ctx->done)
     {
-        SDL_Event e;
-        while (SDL_PollEvent(&e))
-        {
-            if (e.type == SDL_QUIT)
-            {
-                ctx->done = 1;
-            }
-        }
+        // main loop logic
+        // begin frame
+        // events
+        // input (TODO)
+        // update (TODO)
+        // render
+        // end frame
+
+        cr_begin_frame(ctx);
+
+        cr_handle_events(ctx);
 
         if (ctx->key_states[SDL_SCANCODE_ESCAPE])
         {
@@ -164,8 +168,6 @@ int main(int argc, char** argv)
             printf("down released\n");
         }
 
-
-
         // if (ctx->key_states[SDL_SCANCODE_M])
         // {
         //     if (!m_pressed)
@@ -181,61 +183,21 @@ int main(int argc, char** argv)
         //     m_pressed = 0;
         // }
 
-        // if (ctx->key_states[SDL_SCANCODE_N])
-        // {
-        //     if (!n_pressed)
-        //     {
-        //         n_pressed = 1;
-        //         printf("playing sound\n");
-        //         Mix_PlayChannel(1, pop2_sound, 0);
-        //         printf("done playing sound\n");
-        //     }
-        // }
-        // else if (n_pressed)
-        // {
-        //     n_pressed = 0;
-        // }
+        cr_render(ctx);
 
-        // if (ctx->key_states[SDL_SCANCODE_B])
-        // {
-        //     if (!b_pressed)
-        //     {
-        //         b_pressed = 1;
-        //         printf("playing sound\n");
-        //         Mix_PlayChannel(1, pop3_sound, 0);
-        //         printf("done playing sound\n");
-        //     }
-        // }
-        // else if (b_pressed)
-        // {
-        //     b_pressed = 0;
-        // }
-
-        SDL_SetRenderDrawColor(ctx->renderer, 0, 0, 0, 255);
-        SDL_RenderClear(ctx->renderer);
-
-        SDL_RenderCopy(ctx->renderer, person_tex, NULL, &rect);
-
-        cr_render_text(ctx, atlas, "Hello, World!", 2, 2);
-
-        // SDL_SetRenderDrawColor(renderer, 40, 200, 120, 255);
-        // SDL_RenderFillRect(renderer, &rect);
-
-        SDL_RenderPresent(ctx->renderer);
-        SDL_Delay(1);
+        cr_end_frame(ctx);
     }
 
     printf("done with main loop\n");
 
-    cr_destroy_font_atlas(atlas);
 
+    // Free the resources alocated for the application.
     // Mix_FreeChunk(pop_sound);
-    // Mix_FreeChunk(pop2_sound);
-    // Mix_FreeChunk(pop3_sound);
     TTF_CloseFont(font);
     cr_destroy_image(person_tex);
-    // SDL_DestroyTexture(text_tex);
+    cr_destroy_font_atlas(atlas);
 
+    // Destroy the context and terminate the framework.
     cr_destroy_context(ctx);
     cr_terminate();
 
