@@ -32,7 +32,7 @@ int main(int argc, char** argv)
     // TODO:
     // regulate framerate
 
-    cr_texture* person_tex = cr_load_image(ctx, "character.png");
+    cr_texture* person_tex = cr_load_image(ctx, "assets/character.png");
     if (!person_tex)
     {
         fprintf(stderr, "failed to load image. %s\n", cr_get_error());
@@ -41,7 +41,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    cr_font* font = cr_load_font("DroidSansMono.ttf", 12);
+    cr_font* font = cr_load_font("assets/DroidSansMono.ttf", 12);
     if (!font)
     {
         fprintf(stderr, "failed to load font. %s\n", cr_get_error());
