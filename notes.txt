@@ -1,0 +1,13 @@
+
+
+
+Building SDL2_mixer
+./configure --prefix=$CRUMBS/build-sdl-mixer \
+--with-sdl-prefix=$CRUMBS/build-sdl \
+LDFLAGS="-L$CRUMBS/build-libvorbis/lib -L$CRUMBS/build-libogg/lib" \
+CPPFLAGS="-I$CRUMBS/build-libvorbis/include -I$CRUMBS/build-libogg/include"
+
+
+If an error like "no such audio device" occurs when initializing SDL2_mixer,
+ensure that libasound-dev and libpulse-dev are installed (ALSA and PulseAudio).
+
