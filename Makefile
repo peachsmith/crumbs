@@ -16,7 +16,7 @@ LIB=-L$(SDL)/lib   \
 -L$(SDL_TTF)/lib   \
 -L$(SDL_MIXER)/lib
 
-SRC=main.c crumbs.c
+SRC=main.c crumbs.c collection.c input.c
 
 LNK=-lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer
 

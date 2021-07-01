@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "crumbs.h"
+#include "collection.h"
 
 int main(int argc, char** argv)
 {

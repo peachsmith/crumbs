@@ -3,6 +3,9 @@
 //==========================================================================//
 
 #include "crumbs.h"
+#include "collection.h"
+#include "input.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <SDL2/SDL.h>
@@ -42,22 +45,56 @@ typedef struct cr_glyph {
     cr_texture* img;
 }cr_glyph;
 
+// key indices
+#define CR_KEY_LEFT 0
+#define CR_KEY_UP 0
+#define CR_KEY_RIGHT 0
+#define CR_KEY_DOWN 0
+
+#define CR_KEY_COUNT 4
+
 /**
  * The implementation of the cr_context data type.
  */
 struct cr_context {
+
     SDL_Window* window;
     SDL_Renderer* renderer;
-    const char* key_states;
     SDL_Event event;
     Uint32 ticks;
-    int done;
 
-    // temporary debugging fields
-    SDL_Rect* tmp_rect;
-    cr_texture* tmp_entity;
-    cr_glyph* tmp_atlas;
+    const char* key_states;
+
+    size_t inputs[CR_KEY_COUNT];
+
+    jep_node* input_handlers;
+
+    int done;
 };
+
+// TODO: move this to another file.
+void root_input_handler(cr_context* ctx)
+{
+    if (ctx->key_states[SDL_SCANCODE_LEFT])
+    {
+        if (!ctx->inputs[CR_KEY_LEFT])
+        {
+            printf("left was pressed\n");
+            ctx->inputs[CR_KEY_LEFT] = 1;
+        }
+    }
+    else if (ctx->inputs[CR_KEY_LEFT])
+    {
+        printf("left was released\n");
+        ctx->inputs[CR_KEY_LEFT] = 0;
+    }
+}
+
+// TODO: move this to another file.
+void input_handler_destructor(void* data)
+{
+    cr_destroy_input_handler((input_handler*)data);
+}
 
 int cr_initialize()
 {
@@ -175,11 +212,37 @@ cr_context* cr_create_context()
     int len = 0;
     ctx->key_states = SDL_GetKeyboardState(&len);
 
+    // Initialize the input actuation states to 0.
+    for (int i = 0; i < CR_KEY_COUNT; i++)
+    {
+        ctx->inputs[i] = 0;
+    }
+
+    input_handler* root_input = cr_create_input_handler(root_input_handler);
+    if (root_input == NULL)
+    {
+        SDL_DestroyRenderer(ctx->renderer);
+        SDL_DestroyWindow(ctx->window);
+        free(ctx);
+        return NULL;
+    }
+
+    ctx->input_handlers = jep_create_node((void*)root_input);
+    if (ctx->input_handlers == NULL)
+    {
+        cr_destroy_input_handler(root_input);
+        SDL_DestroyRenderer(ctx->renderer);
+        SDL_DestroyWindow(ctx->window);
+        free(ctx);
+        return NULL;
+    }
+
     // The SDL_SCANCODE_RGUI constant currently has a value of 231
     // as of writing this code. We may not need to handle that many
     // keys, but we require it just in case.
     if (len < SDL_SCANCODE_RGUI)
     {
+        jep_destroy_collection(ctx->input_handlers, input_handler_destructor);
         SDL_DestroyRenderer(ctx->renderer);
         SDL_DestroyWindow(ctx->window);
         free(ctx);
@@ -188,10 +251,6 @@ cr_context* cr_create_context()
 
     ctx->ticks = 0;
     ctx->done = 0;
-
-    ctx->tmp_rect = NULL;
-    ctx->tmp_entity = NULL;
-    ctx->tmp_atlas = NULL;
 
     return ctx;
 }
@@ -203,6 +262,7 @@ void cr_destroy_context(cr_context* ctx)
         return;
     }
 
+    jep_destroy_collection(ctx->input_handlers, input_handler_destructor);
     SDL_DestroyRenderer(ctx->renderer);
     SDL_DestroyWindow(ctx->window);
     free(ctx);
@@ -231,7 +291,14 @@ void cr_handle_events(cr_context* ctx)
 
 void cr_handle_input(cr_context* ctx)
 {
+    // Get the top of the input handler stack.
+    jep_node* last = ctx->input_handlers->last;
 
+    // Cast the data pointer to an input handler.
+    input_handler* i = (input_handler*)(last->data);
+
+    // Call the current handler's handle function.
+    i->handle(ctx);
 }
 
 void cr_update(cr_context* ctx)
