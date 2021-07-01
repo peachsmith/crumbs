@@ -1,8 +1,65 @@
+//==========================================================================//
+//                      BEGIN Core API Implementation                       //
+//==========================================================================//
+
 #include "crumbs.h"
 #include <stdlib.h>
 #include <string.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 
-int cr_init()
+/**
+ * A texture represents graphical data that can be rendered on the screen.
+ */
+typedef SDL_Texture cr_texture;
+
+/**
+ * A font is data that allows the creation of text.
+ */
+typedef TTF_Font cr_font;
+
+/**
+ * A sound is a short segment of sound whose playback duration is usually
+ * a few seconds.
+ */
+typedef Mix_Chunk cr_sound;
+
+/**
+ * Music is sound data that is intented to play for an extended period
+ * of time.
+ */
+typedef Mix_Chunk cr_music;
+
+/**
+ * A glyph represents a single text character that can be rendered on
+ * the screen.
+ */
+typedef struct cr_glyph {
+    int w;
+    int h;
+    cr_texture* img;
+}cr_glyph;
+
+/**
+ * The implementation of the cr_context data type.
+ */
+struct cr_context {
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+    const char* key_states;
+    SDL_Event event;
+    Uint32 ticks;
+    int done;
+
+    // temporary debugging fields
+    SDL_Rect* tmp_rect;
+    cr_texture* tmp_entity;
+    cr_glyph* tmp_atlas;
+};
+
+int cr_initialize()
 {
     // Initialize SDL.
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0)
@@ -151,9 +208,9 @@ void cr_destroy_context(cr_context* ctx)
     free(ctx);
 }
 
-const char* cr_get_error()
+int cr_is_done(cr_context* ctx)
 {
-    return SDL_GetError();
+    return ctx->done;
 }
 
 void cr_begin_frame(cr_context* ctx)
@@ -172,6 +229,16 @@ void cr_handle_events(cr_context* ctx)
     }
 }
 
+void cr_handle_input(cr_context* ctx)
+{
+
+}
+
+void cr_update(cr_context* ctx)
+{
+
+}
+
 void cr_render(cr_context* ctx)
 {
     // NOTE: This is an example of drawing a filled rectangle
@@ -184,12 +251,6 @@ void cr_render(cr_context* ctx)
 
     // Remove existing graphics data.
     SDL_RenderClear(ctx->renderer);
-
-    // TEMP: render a PNG image.
-    SDL_RenderCopy(ctx->renderer, ctx->tmp_entity, NULL, ctx->tmp_rect);
-
-    // TEMP: render some static text.
-    cr_render_text(ctx, ctx->tmp_atlas, "Hello, World!", 2, 2);
 
     // Render the graphics to the screen.
     SDL_RenderPresent(ctx->renderer);
@@ -205,6 +266,14 @@ void cr_end_frame(cr_context* ctx)
         SDL_Delay(target - (SDL_GetTicks() - ctx->ticks));
     }
 }
+
+//==========================================================================//
+//                       END Core API Implementation                        //
+//==========================================================================//
+
+
+
+// temporary stuff
 
 cr_texture* cr_load_image(cr_context* ctx, const char* path)
 {

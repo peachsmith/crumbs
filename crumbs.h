@@ -1,60 +1,11 @@
 #ifndef JEP_CRUMBS_H
 #define JEP_CRUMBS_H
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
-
-/**
- * A texture represents graphical data that can be rendered on the screen.
- */
-typedef SDL_Texture cr_texture;
-
-/**
- * A font is data that allows the creation of text.
- */
-typedef TTF_Font cr_font;
-
-/**
- * A sound is a short segment of sound whose playback duration is usually
- * a few seconds.
- */
-typedef Mix_Chunk cr_sound;
-
-/**
- * Music is sound data that is intented to play for an extended period
- * of time.
- */
-typedef Mix_Chunk cr_music;
-
-/**
- * A glyph represents a single text character that can be rendered on
- * the screen.
- */
-typedef struct cr_glyph {
-    int w;
-    int h;
-    cr_texture* img;
-}cr_glyph;
-
 /**
  * A context contains the state of the application.
  * Only one context should be created for an application.
  */
-typedef struct cr_context {
-    SDL_Window* window;
-    SDL_Renderer* renderer;
-    const char* key_states;
-    SDL_Event event;
-    Uint32 ticks;
-    int done;
-
-    // temporary debugging fields
-    SDL_Rect* tmp_rect;
-    cr_texture* tmp_entity;
-    cr_glyph* tmp_atlas;
-} cr_context;
+typedef struct cr_context cr_context;
 
 /**
  * Initializes the crumbs framework.
@@ -64,7 +15,7 @@ typedef struct cr_context {
  * Returns:
  *   int - 1 on success or 0 on failure.
  */
-int cr_init();
+int cr_initialize();
 
 /**
  * Terminates the crumbs framework.
@@ -90,12 +41,15 @@ cr_context* cr_create_context();
 void cr_destroy_context(cr_context* ctx);
 
 /**
- * Retrieves an error message.
+ * Determines if the main loop should be concluded.
+ *
+ * Params:
+ *   cr_context* - the context of the application
  *
  * Returns:
- *   char* - a string containing an error message
+ *   int - 1 if the loop should be exited, or 0 if it should continue
  */
-const char* cr_get_error();
+int cr_is_done(cr_context* ctx);
 
 /**
  * Begins an iteration of the main loop.
@@ -108,17 +62,35 @@ const char* cr_get_error();
 void cr_begin_frame(cr_context* ctx);
 
 /**
- * Detects events like window management.
- * 
+ * Handles events like messages from a window management system.
+ *
  * Params:
  *   cr_context* - the context of the application
  */
 void cr_handle_events(cr_context* ctx);
 
 /**
+ * Handles user input.
+ *
+ * Params:
+ *   cr_context* - the context of the application
+ */
+void cr_handle_input(cr_context* ctx);
+
+/**
+ * Updates the state of the application.
+ * This is where we handle things like collision detection and advancing
+ * the frames of an animation.
+ *
+ * Params:
+ *   cr_context* - the context of the application
+ */
+void cr_update(cr_context* ctx);
+
+/**
  * Renders graphical data to the screen based on the current
  * state of the application.
- * 
+ *
  * Params:
  *   cr_context* - the context of the application
  */
@@ -132,94 +104,5 @@ void cr_render(cr_context* ctx);
  *   cr_context* - the context of the application
  */
 void cr_end_frame(cr_context* ctx);
-
-/**
- * Loads an image from a file.
- *
- * Params:
- *   cr_context* - the current context
- *   char* - the path of the file to load
- *
- * Returns:
- *   cr_texture* - a new texture, or NULL on failure
- */
-cr_texture* cr_load_image(cr_context* ctx, const char* path);
-
-/**
- * Frees the resources allocated for a texture.
- *
- * Params:
- *   cr_texture* a texture to free
- */
-void cr_destroy_image(cr_texture* img);
-
-/**
- * Loads a font from a font file.
- *
- * Params:
- *   const char* - the file path of the font to load
- *   int - the point size of the font
- *
- * Returns:
- *   cr_font* - a font object
- */
-cr_font* cr_load_font(const char* path, int point_size);
-
-/**
- * Frees the resources allocated for a font object.
- *
- * Params:
- *   cr_font* - a font to free
- */
-void cr_destroy_font(cr_font* font);
-
-/**
- * Creates a texture for a single character.
- *
- * Params:
- *   cr_context* - the context
- *   cr_font* - the font on which the texture data is based
- *   char - the character to convert to a texture
- *   cr_glyph* - a reference to a glyph object to receive the data
- *
- * Returns:
- *   int - 1 on success or 0 on failure
- */
-int cr_create_glyph_image(cr_context* ctx, cr_font* font, char c, cr_glyph* g);
-
-/**
- * Creates a font atlas for a given font.
- * A font atlas is a collection of texture data for individual characters.
- * This can be used for dynamic strings of text that may change based on
- * some events.
- *
- * Params:
- *   cr_context* - the context
- *   cr_font* - the font to use
- *
- * Returns:
- *   cr_glyph* - an array of glyph data
- */
-cr_glyph* cr_create_font_atlas(cr_context* ctx, cr_font* font);
-
-/**
- * Frees the resources allocated for a font atlas.
- *
- * Params:
- *   cr_glyph* - a font atlas
- */
-void cr_destroy_font_atlas(cr_glyph* atlas);
-
-/**
- * Renders a string of text to the screen.
- *
- * Params:
- *   cr_context* - the context
- *   cr_glyph* - the font atlas
- *   const char* - a string of text to render
- *   int - the x coordinate on the screen
- *   int - the y coordinate on the screen
- */
-void cr_render_text(cr_context* ctx, cr_glyph* atlas, const char* text, int x, int y);
 
 #endif
