@@ -3,7 +3,6 @@
 //==========================================================================//
 
 #include "crumbs_impl.h"
-#include "collection.h"
 #include "input.h"
 
 #include <stdlib.h>

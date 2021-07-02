@@ -3,8 +3,27 @@
 
 #include "crumbs_impl.h"
 
-// input types
-#define CR_KEYBOARD 1
+/**
+ * Converts a keyboard scancode to an input index.
+ *
+ * Params:
+ *   cr_scancode - a keyboard scancode
+ *
+ * Returns:
+ *   cr_input - the index of an input actuation flag
+ */
+cr_input cr_sc_to_input(cr_scancode sc);
+
+/**
+ * Converts an input index to a keyboard scancode.
+ *
+ * Params:
+ *   cr_input - a key index
+ *
+ * Returns:
+ *   cr_scancode - a keyboard scancode
+ */
+cr_scancode cr_input_to_sc(cr_input key);
 
 /**
  * Creates a new input handler.

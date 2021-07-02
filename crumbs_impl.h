@@ -2,35 +2,84 @@
 #define JEP_CRUMBS_IMPL
 
 #include "crumbs.h"
-#include "input_map.h"
+#include "crumbs_sdl.h"
 #include "collection.h"
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
+// input types
+#define CR_KEYBOARD 1
 
-/**
- * A texture represents graphical data that can be rendered on the screen.
- */
-typedef SDL_Texture cr_texture;
+// total number of inputs
+#define CR_INPUT_COUNT 63
 
-/**
- * A font is data that allows the creation of text.
- */
-typedef TTF_Font cr_font;
+// key indices
+typedef enum cr_input {
+    CR_KEY_ESCAPE,
+    CR_KEY_LEFT,
+    CR_KEY_UP,
+    CR_KEY_RIGHT,
+    CR_KEY_DOWN,
+    CR_KEY_A,
+    CR_KEY_B,
+    CR_KEY_C,
+    CR_KEY_D,
+    CR_KEY_E,
+    CR_KEY_F,
+    CR_KEY_G,
+    CR_KEY_H,
+    CR_KEY_I,
+    CR_KEY_J,
+    CR_KEY_K,
+    CR_KEY_L,
+    CR_KEY_M,
+    CR_KEY_N,
+    CR_KEY_O,
+    CR_KEY_P,
+    CR_KEY_Q,
+    CR_KEY_R,
+    CR_KEY_S,
+    CR_KEY_T,
+    CR_KEY_U,
+    CR_KEY_V,
+    CR_KEY_W,
+    CR_KEY_X,
+    CR_KEY_Y,
+    CR_KEY_Z,
+    CR_KEY_0,
+    CR_KEY_1,
+    CR_KEY_2,
+    CR_KEY_3,
+    CR_KEY_4,
+    CR_KEY_5,
+    CR_KEY_6,
+    CR_KEY_7,
+    CR_KEY_8,
+    CR_KEY_9,
+    CR_KEY_MINUS,
+    CR_KEY_EQUALS,
+    CR_KEY_BACKTICK,
+    CR_KEY_COMMA,
+    CR_KEY_PERIOD,
+    CR_KEY_SEMICOLON,
+    CR_KEY_APOSTROPHE,
+    CR_KEY_LEFT_BRACKET,
+    CR_KEY_RIGHT_BRACKET,
+    CR_KEY_BACKSPACE,
+    CR_KEY_SPACE,
+    CR_KEY_SLASH,
+    CR_KEY_BACKSLASH,
+    CR_KEY_TAB,
+    CR_KEY_CAPS,
+    CR_KEY_LSHIFT,
+    CR_KEY_RSHIFT,
+    CR_KEY_LALT,
+    CR_KEY_RALT,
+    CR_KEY_LCTRL,
+    CR_KEY_RCTRL,
 
-/**
- * A sound is a short segment of sound whose playback duration is usually
- * a few seconds.
- */
-typedef Mix_Chunk cr_sound;
+    // limit of keys
+    CR_KEY_MAX
+} cr_input;
 
-/**
- * Music is sound data that is intented to play for an extended period
- * of time.
- */
-typedef Mix_Chunk cr_music;
 
 /**
  * A glyph represents a single text character that can be rendered on
@@ -41,7 +90,6 @@ typedef struct cr_glyph {
     int h;
     cr_texture* img;
 }cr_glyph;
-
 
 /**
  * cr_context implementation
