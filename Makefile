@@ -18,7 +18,7 @@ LIB=-L$(SDL)/lib   \
 
 FLAGS=-Wall -Werror
 
-SRC=main.c crumbs.c collection.c input.c
+SRC=main.c crumbs.c collection.c input.c input_map.c
 
 LNK=-lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer
 

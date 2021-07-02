@@ -2,95 +2,32 @@
 //                      BEGIN Core API Implementation                       //
 //==========================================================================//
 
-#include "crumbs.h"
+#include "crumbs_impl.h"
 #include "collection.h"
 #include "input.h"
 
 #include <stdlib.h>
 #include <string.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
-
-/**
- * A texture represents graphical data that can be rendered on the screen.
- */
-typedef SDL_Texture cr_texture;
-
-/**
- * A font is data that allows the creation of text.
- */
-typedef TTF_Font cr_font;
-
-/**
- * A sound is a short segment of sound whose playback duration is usually
- * a few seconds.
- */
-typedef Mix_Chunk cr_sound;
-
-/**
- * Music is sound data that is intented to play for an extended period
- * of time.
- */
-typedef Mix_Chunk cr_music;
-
-/**
- * A glyph represents a single text character that can be rendered on
- * the screen.
- */
-typedef struct cr_glyph {
-    int w;
-    int h;
-    cr_texture* img;
-}cr_glyph;
-
-// key indices
-#define CR_KEY_LEFT 0
-#define CR_KEY_UP 0
-#define CR_KEY_RIGHT 0
-#define CR_KEY_DOWN 0
-
-#define CR_KEY_COUNT 4
-
-/**
- * The implementation of the cr_context data type.
- */
-struct cr_context {
-
-    SDL_Window* window;
-    SDL_Renderer* renderer;
-    SDL_Event event;
-    Uint32 ticks;
-
-    const Uint8* key_states;
-
-    size_t inputs[CR_KEY_COUNT];
-
-    jep_node* input_handlers;
-
-    int done;
-};
 
 // TODO: move this to another file.
-void root_input_handler(cr_context* ctx)
+void root_input_handler(cr_context* ctx, void* target)
 {
-    if (ctx->key_states[SDL_SCANCODE_LEFT])
+    if (cr_consume_input(ctx, CR_KEYBOARD, CR_KEY_LEFT))
     {
-        if (!ctx->inputs[CR_KEY_LEFT])
-        {
-            printf("left was pressed\n");
-            ctx->inputs[CR_KEY_LEFT] = 1;
-        }
+        printf("left was pressed\n");
     }
-    else if (ctx->inputs[CR_KEY_LEFT])
+
+    if (cr_peek_input(ctx, CR_KEYBOARD, CR_KEY_RIGHT))
     {
-        printf("left was released\n");
-        ctx->inputs[CR_KEY_LEFT] = 0;
+        printf("right is pressed\n");
+    }
+
+    if (cr_consume_input(ctx, CR_KEYBOARD, CR_KEY_ESCAPE))
+    {
+        ctx->done = 1;
     }
 }
 
-// TODO: move this to another file.
 void input_handler_destructor(void* data)
 {
     cr_destroy_input_handler((input_handler*)data);
@@ -213,7 +150,7 @@ cr_context* cr_create_context()
     ctx->key_states = SDL_GetKeyboardState(&len);
 
     // Initialize the input actuation states to 0.
-    for (int i = 0; i < CR_KEY_COUNT; i++)
+    for (int i = 0; i < CR_INPUT_COUNT; i++)
     {
         ctx->inputs[i] = 0;
     }
@@ -298,7 +235,7 @@ void cr_handle_input(cr_context* ctx)
     input_handler* i = (input_handler*)(last->data);
 
     // Call the current handler's handle function.
-    i->handle(ctx);
+    i->handle(ctx, NULL);
 }
 
 void cr_update(cr_context* ctx)

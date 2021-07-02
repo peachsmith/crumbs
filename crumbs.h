@@ -7,6 +7,8 @@
  */
 typedef struct cr_context cr_context;
 
+typedef struct input_handler input_handler;
+
 /**
  * Initializes the crumbs framework.
  * This should be called once per application before calling any other
