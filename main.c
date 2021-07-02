@@ -22,6 +22,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    cr_configure_context(ctx);
+
     printf("entering main loop\n");
 
     // main loop

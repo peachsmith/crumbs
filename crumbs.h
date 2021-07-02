@@ -42,6 +42,8 @@ cr_context* cr_create_context();
  */
 void cr_destroy_context(cr_context* ctx);
 
+void cr_configure_context(cr_context*);
+
 /**
  * Determines if the main loop should be concluded.
  *

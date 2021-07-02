@@ -9,23 +9,23 @@
 #include <string.h>
 
 // TODO: move this to another file.
-void root_input_handler(cr_context* ctx, void* target)
-{
-    if (cr_consume_input(ctx, CR_KEYBOARD, CR_KEY_LEFT))
-    {
-        printf("left was pressed\n");
-    }
+// void root_input_handler(cr_context* ctx, void* target)
+// {
+//     if (cr_consume_input(ctx, CR_KEYBOARD, CR_KEY_LEFT))
+//     {
+//         printf("left was pressed\n");
+//     }
 
-    if (cr_peek_input(ctx, CR_KEYBOARD, CR_KEY_RIGHT))
-    {
-        printf("right is pressed\n");
-    }
+//     if (cr_peek_input(ctx, CR_KEYBOARD, CR_KEY_RIGHT))
+//     {
+//         printf("right is pressed\n");
+//     }
 
-    if (cr_consume_input(ctx, CR_KEYBOARD, CR_KEY_ESCAPE))
-    {
-        ctx->done = 1;
-    }
-}
+//     if (cr_consume_input(ctx, CR_KEYBOARD, CR_KEY_ESCAPE))
+//     {
+//         ctx->done = 1;
+//     }
+// }
 
 void input_handler_destructor(void* data)
 {
@@ -154,24 +154,24 @@ cr_context* cr_create_context()
         ctx->inputs[i] = 0;
     }
 
-    input_handler* root_input = cr_create_input_handler(root_input_handler);
-    if (root_input == NULL)
-    {
-        SDL_DestroyRenderer(ctx->renderer);
-        SDL_DestroyWindow(ctx->window);
-        free(ctx);
-        return NULL;
-    }
+    // input_handler* root_input = cr_create_input_handler(root_input_handler);
+    // if (root_input == NULL)
+    // {
+    //     SDL_DestroyRenderer(ctx->renderer);
+    //     SDL_DestroyWindow(ctx->window);
+    //     free(ctx);
+    //     return NULL;
+    // }
 
-    ctx->input_handlers = jep_create_node((void*)root_input);
-    if (ctx->input_handlers == NULL)
-    {
-        cr_destroy_input_handler(root_input);
-        SDL_DestroyRenderer(ctx->renderer);
-        SDL_DestroyWindow(ctx->window);
-        free(ctx);
-        return NULL;
-    }
+    ctx->input_handlers = NULL; // jep_create_node((void*)root_input);
+    // if (ctx->input_handlers == NULL)
+    // {
+    //     cr_destroy_input_handler(root_input);
+    //     SDL_DestroyRenderer(ctx->renderer);
+    //     SDL_DestroyWindow(ctx->window);
+    //     free(ctx);
+    //     return NULL;
+    // }
 
     // The SDL_SCANCODE_RGUI constant currently has a value of 231
     // as of writing this code. We may not need to handle that many
