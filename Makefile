@@ -16,10 +16,12 @@ LIB=-L$(SDL)/lib   \
 -L$(SDL_TTF)/lib   \
 -L$(SDL_MIXER)/lib
 
+FLAGS=-Wall -Werror
+
 SRC=main.c crumbs.c collection.c input.c
 
 LNK=-lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer
 
 all:
-	$(CC) $(LIB) $(INC) $(SRC) -o crumbs $(LNK)
+	$(CC) $(FLAGS) $(LIB) $(INC) $(SRC) -o crumbs $(LNK)
 

@@ -63,7 +63,7 @@ struct cr_context {
     SDL_Event event;
     Uint32 ticks;
 
-    const char* key_states;
+    const Uint8* key_states;
 
     size_t inputs[CR_KEY_COUNT];
 
@@ -133,7 +133,7 @@ int cr_initialize()
     }
 
     // Initialize SDL_image for loading PNG files.
-    if (!IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)
+    if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
     {
         fprintf(stderr, "failed to initialize SDL2_image. %s\n", SDL_GetError());
         Mix_Quit();
