@@ -1,29 +1,7 @@
 #ifndef JEP_INPUT_H
 #define JEP_INPUT_H
 
-#include "crumbs_impl.h"
-
-/**
- * Converts a keyboard scancode to an input index.
- *
- * Params:
- *   cr_scancode - a keyboard scancode
- *
- * Returns:
- *   cr_input - the index of an input actuation flag
- */
-cr_input cr_sc_to_input(cr_scancode sc);
-
-/**
- * Converts an input index to a keyboard scancode.
- *
- * Params:
- *   cr_input - a key index
- *
- * Returns:
- *   cr_scancode - a keyboard scancode
- */
-cr_scancode cr_input_to_sc(cr_input key);
+#include "crumbs.h"
 
 /**
  * Creates a new input handler.
@@ -34,15 +12,15 @@ cr_scancode cr_input_to_sc(cr_input key);
  * Returns:
  *   input_handler* - a new input handler object
  */
-input_handler* cr_create_input_handler(cr_function f);
+cr_input_handler* cr_create_input_handler(cr_function f);
 
 /**
  * Frees the resources allocated for an input handler.
  *
  * Params:
- *   input_handler* - an input handler to destroy
+ *   cr_input_handler* - an input handler to destroy
  */
-void cr_destroy_input_handler(input_handler* handler);
+void cr_destroy_input_handler(cr_input_handler* handler);
 
 /**
  * Checks the current actuation state of an input.

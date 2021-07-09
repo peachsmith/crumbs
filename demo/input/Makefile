@@ -9,7 +9,7 @@ SDL_IMAGE=$(DEPS)/build-sdl-image
 SDL_TTF=$(DEPS)/build-sdl-ttf
 SDL_MIXER=$(DEPS)/build-sdl-mixer
 
-INC=-I$(SDL)/include -I..
+INC=-I$(SDL)/include -I../..
 
 LIB=-L$(SDL)/lib   \
 -L$(SDL_IMAGE)/lib \
@@ -18,7 +18,7 @@ LIB=-L$(SDL)/lib   \
 
 FLAGS=-Wall -Werror
 
-SRC=../main.c ../crumbs.c ../collection.c ../input.c demo.c
+SRC=../../main.c ../../crumbs.c ../../collection.c ../../input.c demo.c
 
 LNK=-lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer
 

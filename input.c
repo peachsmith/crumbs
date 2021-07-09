@@ -1,84 +1,104 @@
 #include "input.h"
 #include <stdlib.h>
 
-cr_input cr_sc_to_input(cr_scancode sc)
-{
-    switch (sc)
-    {
-        // arrow keys
-    case CR_SC_LEFT:  return CR_KEY_LEFT;
-    case CR_SC_UP:    return CR_KEY_UP;
-    case CR_SC_RIGHT: return CR_KEY_RIGHT;
-    case CR_SC_DOWN:  return CR_KEY_DOWN;
+typedef SDL_Scancode cr_scancode;
 
-        // alphanumeric keys
-    case CR_SC_A: return CR_KEY_A;
-    case CR_SC_B: return CR_KEY_B;
-    case CR_SC_C: return CR_KEY_C;
-    case CR_SC_D: return CR_KEY_D;
-    case CR_SC_E: return CR_KEY_E;
-    case CR_SC_F: return CR_KEY_F;
-    case CR_SC_G: return CR_KEY_G;
-    case CR_SC_H: return CR_KEY_H;
-    case CR_SC_I: return CR_KEY_I;
-    case CR_SC_J: return CR_KEY_J;
-    case CR_SC_K: return CR_KEY_K;
-    case CR_SC_L: return CR_KEY_L;
-    case CR_SC_M: return CR_KEY_M;
-    case CR_SC_N: return CR_KEY_N;
-    case CR_SC_O: return CR_KEY_O;
-    case CR_SC_P: return CR_KEY_P;
-    case CR_SC_Q: return CR_KEY_Q;
-    case CR_SC_R: return CR_KEY_R;
-    case CR_SC_S: return CR_KEY_S;
-    case CR_SC_T: return CR_KEY_T;
-    case CR_SC_U: return CR_KEY_U;
-    case CR_SC_V: return CR_KEY_V;
-    case CR_SC_W: return CR_KEY_W;
-    case CR_SC_X: return CR_KEY_X;
-    case CR_SC_Y: return CR_KEY_Y;
-    case CR_SC_Z: return CR_KEY_Z;
-    case CR_SC_0: return CR_KEY_0;
-    case CR_SC_1: return CR_KEY_1;
-    case CR_SC_2: return CR_KEY_2;
-    case CR_SC_3: return CR_KEY_3;
-    case CR_SC_4: return CR_KEY_4;
-    case CR_SC_5: return CR_KEY_5;
-    case CR_SC_6: return CR_KEY_6;
-    case CR_SC_7: return CR_KEY_7;
-    case CR_SC_8: return CR_KEY_8;
-    case CR_SC_9: return CR_KEY_9;
+/**
+ * Converts a keyboard scancode to an input index.
+ *
+ * Params:
+ *   cr_scancode - a keyboard scancode
+ *
+ * Returns:
+ *   cr_input - the index of an input actuation flag
+ */
+// static cr_input cr_sc_to_input(cr_scancode sc)
+// {
+//     switch (sc)
+//     {
+//         // arrow keys
+//     case CR_SC_LEFT:  return CR_KEY_LEFT;
+//     case CR_SC_UP:    return CR_KEY_UP;
+//     case CR_SC_RIGHT: return CR_KEY_RIGHT;
+//     case CR_SC_DOWN:  return CR_KEY_DOWN;
 
-        // symbols
-    case CR_SC_MINUS:         return CR_KEY_ESCAPE;
-    case CR_SC_EQUALS:        return CR_KEY_EQUALS;
-    case CR_SC_COMMA:         return CR_KEY_COMMA;
-    case CR_SC_PERIOD:        return CR_KEY_PERIOD;
-    case CR_SC_SEMICOLON:     return CR_KEY_SEMICOLON;
-    case CR_SC_APOSTROPHE:    return CR_KEY_APOSTROPHE;
-    case CR_SC_LEFT_BRACKET:  return CR_KEY_LEFT_BRACKET;
-    case CR_SC_RIGHT_BRACKET: return CR_KEY_RIGHT_BRACKET;
-    case CR_SC_SLASH:         return CR_KEY_SLASH;
-    case CR_SC_BACKSLASH:     return CR_KEY_BACKSLASH;
-    case CR_SC_BACKTICK:      return CR_KEY_BACKTICK;
-    case CR_SC_SPACE:         return CR_KEY_SPACE;
+//         // alphanumeric keys
+//     case CR_SC_A: return CR_KEY_A;
+//     case CR_SC_B: return CR_KEY_B;
+//     case CR_SC_C: return CR_KEY_C;
+//     case CR_SC_D: return CR_KEY_D;
+//     case CR_SC_E: return CR_KEY_E;
+//     case CR_SC_F: return CR_KEY_F;
+//     case CR_SC_G: return CR_KEY_G;
+//     case CR_SC_H: return CR_KEY_H;
+//     case CR_SC_I: return CR_KEY_I;
+//     case CR_SC_J: return CR_KEY_J;
+//     case CR_SC_K: return CR_KEY_K;
+//     case CR_SC_L: return CR_KEY_L;
+//     case CR_SC_M: return CR_KEY_M;
+//     case CR_SC_N: return CR_KEY_N;
+//     case CR_SC_O: return CR_KEY_O;
+//     case CR_SC_P: return CR_KEY_P;
+//     case CR_SC_Q: return CR_KEY_Q;
+//     case CR_SC_R: return CR_KEY_R;
+//     case CR_SC_S: return CR_KEY_S;
+//     case CR_SC_T: return CR_KEY_T;
+//     case CR_SC_U: return CR_KEY_U;
+//     case CR_SC_V: return CR_KEY_V;
+//     case CR_SC_W: return CR_KEY_W;
+//     case CR_SC_X: return CR_KEY_X;
+//     case CR_SC_Y: return CR_KEY_Y;
+//     case CR_SC_Z: return CR_KEY_Z;
+//     case CR_SC_0: return CR_KEY_0;
+//     case CR_SC_1: return CR_KEY_1;
+//     case CR_SC_2: return CR_KEY_2;
+//     case CR_SC_3: return CR_KEY_3;
+//     case CR_SC_4: return CR_KEY_4;
+//     case CR_SC_5: return CR_KEY_5;
+//     case CR_SC_6: return CR_KEY_6;
+//     case CR_SC_7: return CR_KEY_7;
+//     case CR_SC_8: return CR_KEY_8;
+//     case CR_SC_9: return CR_KEY_9;
 
-        // control keys
-    case CR_SC_LCTRL:    return CR_KEY_LCTRL;
-    case CR_SC_RCTRL:    return CR_KEY_RCTRL;
-    case CR_SC_LALT:     return CR_KEY_LALT;
-    case CR_SC_RALT:     return CR_KEY_RALT;
-    case CR_SC_LSHIFT:   return CR_KEY_LSHIFT;
-    case CR_SC_RSHIFT:   return CR_KEY_RSHIFT;
-    case CR_SC_TAB:      return CR_KEY_TAB;
-    case CR_SC_CAPS:     return CR_KEY_CAPS;
-    case CR_SC_ESCAPE:   return CR_KEY_ESCAPE;
+//         // symbols
+//     case CR_SC_MINUS:         return CR_KEY_ESCAPE;
+//     case CR_SC_EQUALS:        return CR_KEY_EQUALS;
+//     case CR_SC_COMMA:         return CR_KEY_COMMA;
+//     case CR_SC_PERIOD:        return CR_KEY_PERIOD;
+//     case CR_SC_SEMICOLON:     return CR_KEY_SEMICOLON;
+//     case CR_SC_APOSTROPHE:    return CR_KEY_APOSTROPHE;
+//     case CR_SC_LEFT_BRACKET:  return CR_KEY_LEFT_BRACKET;
+//     case CR_SC_RIGHT_BRACKET: return CR_KEY_RIGHT_BRACKET;
+//     case CR_SC_SLASH:         return CR_KEY_SLASH;
+//     case CR_SC_BACKSLASH:     return CR_KEY_BACKSLASH;
+//     case CR_SC_BACKTICK:      return CR_KEY_BACKTICK;
+//     case CR_SC_SPACE:         return CR_KEY_SPACE;
 
-    default: return CR_KEY_MAX;
-    }
-}
+//         // control keys
+//     case CR_SC_LCTRL:    return CR_KEY_LCTRL;
+//     case CR_SC_RCTRL:    return CR_KEY_RCTRL;
+//     case CR_SC_LALT:     return CR_KEY_LALT;
+//     case CR_SC_RALT:     return CR_KEY_RALT;
+//     case CR_SC_LSHIFT:   return CR_KEY_LSHIFT;
+//     case CR_SC_RSHIFT:   return CR_KEY_RSHIFT;
+//     case CR_SC_TAB:      return CR_KEY_TAB;
+//     case CR_SC_CAPS:     return CR_KEY_CAPS;
+//     case CR_SC_ESCAPE:   return CR_KEY_ESCAPE;
 
-cr_scancode cr_input_to_sc(cr_input key)
+//     default: return CR_KEY_MAX;
+//     }
+// }
+
+/**
+ * Converts an input index to a keyboard scancode.
+ *
+ * Params:
+ *   cr_input - a key index
+ *
+ * Returns:
+ *   cr_scancode - a keyboard scancode
+ */
+static cr_scancode cr_input_to_sc(cr_input key)
 {
     switch (key)
     {
@@ -155,9 +175,9 @@ cr_scancode cr_input_to_sc(cr_input key)
     }
 }
 
-input_handler* cr_create_input_handler(cr_function f)
+cr_input_handler* cr_create_input_handler(cr_function f)
 {
-    input_handler* input = (input_handler*)malloc(sizeof(input_handler));
+    cr_input_handler* input = (cr_input_handler*)malloc(sizeof(cr_input_handler));
 
     if (input == NULL)
     {
@@ -169,7 +189,7 @@ input_handler* cr_create_input_handler(cr_function f)
     return input;
 }
 
-void cr_destroy_input_handler(input_handler* handler)
+void cr_destroy_input_handler(cr_input_handler* handler)
 {
     if (handler == NULL)
     {

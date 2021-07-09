@@ -2,34 +2,14 @@
 //                      BEGIN Core API Implementation                       //
 //==========================================================================//
 
-#include "crumbs_impl.h"
 #include "input.h"
 
 #include <stdlib.h>
 #include <string.h>
 
-// TODO: move this to another file.
-// void root_input_handler(cr_context* ctx, void* target)
-// {
-//     if (cr_consume_input(ctx, CR_KEYBOARD, CR_KEY_LEFT))
-//     {
-//         printf("left was pressed\n");
-//     }
-
-//     if (cr_peek_input(ctx, CR_KEYBOARD, CR_KEY_RIGHT))
-//     {
-//         printf("right is pressed\n");
-//     }
-
-//     if (cr_consume_input(ctx, CR_KEYBOARD, CR_KEY_ESCAPE))
-//     {
-//         ctx->done = 1;
-//     }
-// }
-
 void input_handler_destructor(void* data)
 {
-    cr_destroy_input_handler((input_handler*)data);
+    cr_destroy_input_handler((cr_input_handler*)data);
 }
 
 int cr_initialize()
@@ -154,24 +134,7 @@ cr_context* cr_create_context()
         ctx->inputs[i] = 0;
     }
 
-    // input_handler* root_input = cr_create_input_handler(root_input_handler);
-    // if (root_input == NULL)
-    // {
-    //     SDL_DestroyRenderer(ctx->renderer);
-    //     SDL_DestroyWindow(ctx->window);
-    //     free(ctx);
-    //     return NULL;
-    // }
-
-    ctx->input_handlers = NULL; // jep_create_node((void*)root_input);
-    // if (ctx->input_handlers == NULL)
-    // {
-    //     cr_destroy_input_handler(root_input);
-    //     SDL_DestroyRenderer(ctx->renderer);
-    //     SDL_DestroyWindow(ctx->window);
-    //     free(ctx);
-    //     return NULL;
-    // }
+    ctx->input_handlers = NULL;
 
     // The SDL_SCANCODE_RGUI constant currently has a value of 231
     // as of writing this code. We may not need to handle that many
@@ -231,7 +194,7 @@ void cr_handle_input(cr_context* ctx)
     jep_node* last = ctx->input_handlers->last;
 
     // Cast the data pointer to an input handler.
-    input_handler* i = (input_handler*)(last->data);
+    cr_input_handler* i = (cr_input_handler*)(last->data);
 
     // Call the current handler's handle function.
     i->handle(ctx, NULL);
@@ -278,7 +241,7 @@ void cr_end_frame(cr_context* ctx)
 
 // temporary stuff
 
-cr_texture* cr_load_image(cr_context* ctx, const char* path)
+cr_resource* cr_load_image(cr_context* ctx, const char* path)
 {
     // Load the image. The IMG_Load returns a pointer to an SDL_Surface
     // which we will need to convert into a texture.
@@ -303,15 +266,26 @@ cr_texture* cr_load_image(cr_context* ctx, const char* path)
         return NULL;
     }
 
-    return texture;
+    cr_resource* res = (cr_resource*)malloc(sizeof(cr_resource));
+    if (!res)
+    {
+        SDL_DestroyTexture(texture);
+        return NULL;
+    }
+
+    res->type = CR_RESOURCE_TEXTURE;
+    res->data.texture = texture;
+
+    return res;
 }
 
-void cr_destroy_image(cr_texture* img)
+void cr_destroy_image(cr_resource* img)
 {
-    SDL_DestroyTexture(img);
+    SDL_DestroyTexture(img->data.texture);
+    free(img);
 }
 
-cr_font* cr_load_font(const char* path, int point_size)
+cr_resource* cr_load_font(const char* path, int point_size)
 {
     TTF_Font* font = TTF_OpenFont(path, point_size);
     if (!font)
@@ -319,45 +293,62 @@ cr_font* cr_load_font(const char* path, int point_size)
         return NULL;
     }
 
-    return font;
+    cr_resource* res = (cr_resource*)malloc(sizeof(cr_resource));
+    if (!res)
+    {
+        TTF_CloseFont(font);
+        return NULL;
+    }
+
+    res->type = CR_RESOURCE_FONT;
+    res->data.font = font;
+
+    return res;
 }
 
-void cr_destroy_font(cr_font* font)
+void cr_destroy_font(cr_resource* font)
 {
-    TTF_CloseFont(font);
+    TTF_CloseFont(font->data.font);
+    free(font);
 }
 
-int cr_create_glyph_image(cr_context* ctx, cr_font* font, char c, cr_glyph* g)
+int cr_create_glyph_image(cr_context* ctx, cr_resource* font, char c, cr_glyph* g)
 {
     SDL_Surface* sur;
 
     SDL_Color color = { 250, 250, 250 };
     // TTF_RenderGlyph_Shaded for foreground and background colors.
-    sur = TTF_RenderGlyph_Blended(font, (Uint16)c, color);
-
+    sur = TTF_RenderGlyph_Blended(font->data.font, (Uint16)c, color);
     if (!sur)
     {
         return 0;
     }
 
     SDL_Texture* tex = SDL_CreateTextureFromSurface(ctx->renderer, sur);
-
+    SDL_FreeSurface(sur);
     if (!tex)
     {
-        SDL_FreeSurface(sur);
         return 0;
     }
 
+    cr_resource* res = (cr_resource*)malloc(sizeof(cr_resource));
+    if (!res)
+    {
+        SDL_DestroyTexture(tex);
+        return 0;
+    }
+
+    res->type = CR_RESOURCE_TEXTURE;
+    res->data.texture = tex;
+
     g->w = sur->w;
     g->h = sur->h;
-    g->img = tex;
-
-    SDL_FreeSurface(sur);
+    g->img->data.texture = tex;
 
     return 1;
 }
 
-cr_glyph* cr_create_font_atlas(cr_context* ctx, cr_font* font)
+cr_glyph* cr_create_font_atlas(cr_context* ctx, cr_resource* font)
 {
     // Allocate spac efor 95 characters.
     // The range 32 to 126 or ' ' to '~'.
@@ -391,7 +382,7 @@ void cr_destroy_font_atlas(cr_glyph* atlas)
 {
     for (int i = 0; i < 95; i++)
     {
-        SDL_DestroyTexture(atlas[i].img);
+        cr_destroy_image(atlas[i].img);
     }
 
     free(atlas);
@@ -417,7 +408,7 @@ void cr_render_text(cr_context* ctx, cr_glyph* atlas, const char* text, int x, i
             r.h = g.h;
 
             // Render the glyph.
-            SDL_RenderCopy(ctx->renderer, g.img, NULL, &r);
+            SDL_RenderCopy(ctx->renderer, g.img->data.texture, NULL, &r);
 
             // Advance the x position based on the width of the
             // the current glyph.
