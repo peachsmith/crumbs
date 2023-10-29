@@ -14,11 +14,11 @@ LIBS=-lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer
 # include the SDL header file.
 MAIN_DEF=-D_start=_SDL_main
 
-D=../../..
+D=../..
 SRC=$(D)/*.c $(D)/common/*.c $(D)/entities/*.c $(D)/input/*.c $(D)/scenes/*.c $(D)/util/*.c
 
 all:
-	$(CC) $(MAIN_DEF) $(SRC) -o demo $(INCLUDE_DIR) $(LINK_DIR) $(LIBS) -lcrumbs
+	$(CC) $(MAIN_DEF) $(SRC) -o demo.out $(INCLUDE_DIR) $(LINK_DIR) $(LIBS) -lcrumbs
 
 debug:
-	$(CC) -g $(MAIN_DEF) $(SRC) -o demo $(INCLUDE_DIR) $(LINK_DIR) $(LIBS) -lcrumbs
+	$(CC) -g $(MAIN_DEF) $(SRC) -o demo.out $(INCLUDE_DIR) $(LINK_DIR) $(LIBS) -lcrumbs

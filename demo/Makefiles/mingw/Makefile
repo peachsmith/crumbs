@@ -18,7 +18,7 @@ D=../..
 SRC=$(D)/*.c $(D)/common/*.c $(D)/entities/*.c $(D)/input/*.c $(D)/scenes/*.c $(D)/util/*.c
 
 all:
-	$(CC) $(MAIN_DEF) $(SRC) -o demo $(INCLUDE_DIR) -mwindows $(LINK_DIR) $(LIBS) -lcrumbs
+	$(CC) $(MAIN_DEF) $(SRC) -o demo.exe $(INCLUDE_DIR) -mwindows $(LINK_DIR) $(LIBS) -lcrumbs
 
 debug:
-	$(CC) -g $(MAIN_DEF) $(SRC) -o demo $(INCLUDE_DIR) $(LINK_DIR) $(LIBS) -lcrumbs
+	$(CC) -g $(MAIN_DEF) $(SRC) -o demo.exe $(INCLUDE_DIR) $(LINK_DIR) $(LIBS) -lcrumbs
