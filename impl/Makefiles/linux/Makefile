@@ -3,17 +3,32 @@
 #=============================================================================
 
 CC=gcc
-LIB_OUTPUT=libcrumbs.so
 
+# libcrumbs.so.1.0.0
+MAJOR_VERSION=1
+MINOR_VERSION=0
+PATCH_VERSION=0
+LIB_NAME=crumbs
+LIB_SONAME=lib$(LIB_NAME).so.$(MAJOR_VERSION)
+LIB_REALNAME=$(LIB_SONAME).$(MINOR_VERSION).$(PATCH_VERSION)
+LIB_DEPENDENCIES=-lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer
+CFLAGS=-Wall -Werror -fPIC -shared -Wl,-soname,$(LIB_SONAME)
 INCLUDE_DIR=-I../.. -I../../..
-
-CFLAGS=-Wall -Werror
-LIBS=-lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer
-
 SRC=../../../impl/*.c
+INSTALL_DIR=/usr/local/lib
 
 all:
-	$(CC) $(CFLAGS) -fPIC -shared $(SRC) -DCRUMBS_EXPORTS -o $(LIB_OUTPUT) $(INCLUDE_DIR) $(LINK_DIR) $(LIBS)
+	$(CC) $(CFLAGS)    $(SRC) -DCRUMBS_EXPORTS -o $(LIB_REALNAME) $(INCLUDE_DIR) $(LIB_DEPENDENCIES)
 
 debug:
-	$(CC) $(CFLAGS) -g -fPIC -shared $(SRC) -DCRUMBS_EXPORTS -o $(LIB_OUTPUT) $(INCLUDE_DIR) $(LINK_DIR) $(LIBS)
+	$(CC) $(CFLAGS) -g $(SRC) -DCRUMBS_EXPORTS -o $(LIB_REALNAME) $(INCLUDE_DIR) $(LIB_DEPENDENCIES)
+
+#install:
+#	mv $(LIB_REALNAME) $(INSTALL_DIR)
+#	cp ../../../crumbs.h /usr/local/include
+#	cd $(INSTALL_DIR)
+#	ln -s $(LIB_REALNAME) $(LIB_SONAME)
+#	cd $(INSTALL_DIR)
+#	ln -s $(LIB_SONAME) "lib$(LIB_NAME).so"
+#	ldconfig
+
