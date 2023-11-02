@@ -15,3 +15,9 @@ all:
 
 debug:
 	$(CC) -g -O0 -fPIC -shared $(SRC) -DCRUMBS_EXPORTS -o libcrumbs.dll $(INCLUDE_DIR) $(LIBS)
+
+dist:
+	mkdir -p mingw/include/crumbs
+	mkdir -p mingw/lib
+	cp libcrumbs.dll mingw/lib
+	cp ../../../crumbs.h mingw/include/crumbs

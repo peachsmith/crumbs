@@ -51,3 +51,10 @@ debug:
 
 
 all: release
+
+dist:
+	mkdir msvc\include\crumbs
+	mkdir msvc\lib
+	copy crumbs.dll msvc\lib
+	copy crumbs.lib msvc\lib
+	copy ..\..\..\crumbs.h msvc\include\crumbs
