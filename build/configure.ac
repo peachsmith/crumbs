@@ -1,4 +1,4 @@
-AC_INIT([crumbs],[1.0])
+AC_INIT([crumbs],[1.0.0])
 AM_INIT_AUTOMAKE([-Wall -Werror subdir-objects])
 AC_CONFIG_MACRO_DIRS([m4])
 AC_PROG_CC
