@@ -3,7 +3,7 @@
 
 // fireball is a hostile entity. We call him "Hostile fireball".
 
-#include "crumbs.h"
+#include "demo.h"
 
 /**
  * Populates an entity type struct with information about the fireball entity.

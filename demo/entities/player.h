@@ -6,7 +6,7 @@
 // be moved around the screen with the arrow keys. The player entity may also
 // be referred to as Frank.
 
-#include "crumbs.h"
+#include "demo.h"
 
 /**
  * Populates an entity type struct with information about the player entity.

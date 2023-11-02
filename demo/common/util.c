@@ -1,6 +1,6 @@
 #include "common/util.h"
 #include "common/collision.h"
-#include "demo/entities/entity_types.h"
+#include "entities/entity_types.h"
 
 void util_draw_collision(
     cr_app *app,

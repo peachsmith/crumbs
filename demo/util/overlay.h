@@ -1,7 +1,7 @@
 #ifndef DEMO_OVERLAY_H
 #define DEMO_OVERLAY_H
 
-#include "crumbs.h"
+#include "demo.h"
 
 /**
  * Renders information about the internal state of the application.

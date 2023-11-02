@@ -1,8 +1,8 @@
-#include "demo/demo.h"
-#include "demo/assets.h"
-#include "demo/entities/info_menu.h"
-#include "demo/entities/entity_types.h"
-#include "demo/util/ui.h"
+#include "demo.h"
+#include "assets.h"
+#include "entities/info_menu.h"
+#include "entities/entity_types.h"
+#include "util/ui.h"
 
 #include "common/util.h"
 

@@ -22,13 +22,3 @@ all:
 
 debug:
 	$(CC) $(CFLAGS) -g $(SRC) -DCRUMBS_EXPORTS -o $(LIB_REALNAME) $(INCLUDE_DIR) $(LIB_DEPENDENCIES)
-
-#install:
-#	mv $(LIB_REALNAME) $(INSTALL_DIR)
-#	cp ../../../crumbs.h /usr/local/include
-#	cd $(INSTALL_DIR)
-#	ln -s $(LIB_REALNAME) $(LIB_SONAME)
-#	cd $(INSTALL_DIR)
-#	ln -s $(LIB_SONAME) "lib$(LIB_NAME).so"
-#	ldconfig
-

@@ -1,7 +1,7 @@
 #ifndef DEMO_SPRITE_H
 #define DEMO_SPRITE_H
 
-#include "crumbs.h"
+#include "demo.h"
 
 /**
  * Renders the player character to the screen.

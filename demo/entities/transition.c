@@ -1,7 +1,7 @@
-#include "demo/demo.h"
-#include "demo/entities/entity_types.h"
-#include "demo/entities/transition.h"
-#include "demo/scenes/scenes.h"
+#include "demo.h"
+#include "entities/entity_types.h"
+#include "entities/transition.h"
+#include "scenes/scenes.h"
 
 #include "common/util.h"
 #include "common/dialog.h"

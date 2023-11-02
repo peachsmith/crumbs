@@ -3,7 +3,7 @@
 
 // Henry is a hostile entity. We call him "Hostile Henry".
 
-#include "crumbs.h"
+#include "demo.h"
 
 /**
  * Populates an entity type struct with information about the henry entity.

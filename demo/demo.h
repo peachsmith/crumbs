@@ -1,12 +1,12 @@
 #ifndef DEMO_H
 #define DEMO_H
 
-#include "crumbs.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <limits.h>
+
+#include <crumbs/crumbs.h>
 
 // image assets
 #define DEMO_TEXTURE_UI 0

@@ -1,9 +1,9 @@
-#include "demo/demo.h"
-#include "demo/input/input.h"
-#include "demo/entities/entity_types.h"
-#include "demo/entities/player.h"
-#include "demo/entities/info_dialog.h"
-#include "demo/entities/demo_dialog.h"
+#include "demo.h"
+#include "input/input.h"
+#include "entities/entity_types.h"
+#include "entities/player.h"
+#include "entities/info_dialog.h"
+#include "entities/demo_dialog.h"
 
 void demo_pause_menu_input(cr_app *app)
 {

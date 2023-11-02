@@ -1,7 +1,7 @@
 #ifndef DEMO_SCENES_H
 #define DEMO_SCENES_H
 
-#include "crumbs.h"
+#include "demo.h"
 
 #define DEMO_SCENE_0 0
 #define DEMO_SCENE_1 1

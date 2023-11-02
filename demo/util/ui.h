@@ -1,7 +1,7 @@
 #ifndef DEMO_UI_H
 #define DEMO_UI_H
 
-#include "crumbs.h"
+#include "demo.h"
 
 #define UI_INDICATOR_ADVANCE 1
 #define UI_INDICATOR_SCROLL_UP 2

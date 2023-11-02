@@ -3,7 +3,7 @@
 
 // This file contains an entity that represents the info menu.
 
-#include "crumbs.h"
+#include "demo.h"
 
 /**
  * Populates an entity type struct with information about the info menu

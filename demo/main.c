@@ -1,5 +1,4 @@
-#include "crumbs.h"
-#include "demo/demo.h"
+#include "demo.h"
 
 int main(int argc, char **argv)
 {

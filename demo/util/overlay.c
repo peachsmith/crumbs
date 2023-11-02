@@ -1,7 +1,7 @@
-#include "demo/demo.h"
-#include "demo/assets.h"
-#include "demo/util/overlay.h"
-#include "demo/entities/entity_types.h"
+#include "demo.h"
+#include "assets.h"
+#include "util/overlay.h"
+#include "entities/entity_types.h"
 
 #include "common/util.h"
 #include "common/collision.h"

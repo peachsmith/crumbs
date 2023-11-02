@@ -1,4 +1,5 @@
 #include "impl.h"
+#include <stdio.h>
 
 static cr_impl *create_impl(int screen_width, int screen_height, int scale);
 
@@ -86,7 +87,8 @@ static void default_draw(cr_app *app)
 
 cr_app *cr_create_app()
 {
-    int default_scale = 3;
+    printf("tee hee, I'm debugging a library\n");
+    int default_scale = 2;
     cr_app *app = NULL;
 
     // Create the app struct.

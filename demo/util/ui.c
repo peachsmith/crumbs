@@ -1,6 +1,6 @@
-#include "demo/demo.h"
-#include "demo/assets.h"
-#include "demo/util/ui.h"
+#include "demo.h"
+#include "assets.h"
+#include "util/ui.h"
 
 void ui_draw_panel(cr_app *app, int x, int y, int w, int h)
 {

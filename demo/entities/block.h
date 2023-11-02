@@ -6,7 +6,7 @@
 // entities is to prevent them from passing through itself.
 // Each type of block has a create function and a register function.
 
-#include "crumbs.h"
+#include "demo.h"
 
 // register and create functions for a small, square block.
 void demo_register_block(cr_entity_type *);

@@ -1,7 +1,7 @@
-#include "demo/demo.h"
-#include "demo/input/input.h"
-#include "demo/entities/entity_types.h"
-#include "demo/scenes/scenes.h"
+#include "demo.h"
+#include "input/input.h"
+#include "entities/entity_types.h"
+#include "scenes/scenes.h"
 
 #include "common/util.h"
 

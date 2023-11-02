@@ -3,7 +3,7 @@
 
 // Jimbo is an NPC that has a small amount of dialog.
 
-#include "crumbs.h"
+#include "demo.h"
 
 /**
  * Populates an entity type struct with information about the jimbo entity.

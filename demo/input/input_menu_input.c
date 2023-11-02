@@ -1,5 +1,5 @@
-#include "demo/demo.h"
-#include "demo/input/input.h"
+#include "demo.h"
+#include "input/input.h"
 
 // This file contains the input handling code for the input actuation debugger
 // menu. Most files in the input directory end with the suffix "_input". Since

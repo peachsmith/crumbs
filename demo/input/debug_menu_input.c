@@ -1,6 +1,6 @@
-#include "demo/demo.h"
-#include "demo/input/input.h"
-#include "demo/entities/entity_types.h"
+#include "demo.h"
+#include "input/input.h"
+#include "entities/entity_types.h"
 
 void demo_debug_menu_input(cr_app *app)
 {

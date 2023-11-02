@@ -5,7 +5,7 @@
 // controlled directly by user input. In this example, the sign entity can
 // be moved around the screen with the arrow keys.
 
-#include "crumbs.h"
+#include "demo.h"
 
 /**
  * Populates an entity type struct with information about the sign entity.

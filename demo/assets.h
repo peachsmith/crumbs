@@ -1,4 +1,4 @@
-#include "crumbs.h"
+#include "demo.h"
 
 #ifndef DEMO_ASSETS_H
 #define DEMO_ASSETS_H

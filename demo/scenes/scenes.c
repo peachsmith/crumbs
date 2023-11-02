@@ -1,5 +1,5 @@
-#include "demo/demo.h"
-#include "demo/scenes/scenes.h"
+#include "demo.h"
+#include "scenes/scenes.h"
 
 void demo_clear_scene(cr_app *app)
 {

@@ -1,8 +1,8 @@
-#include "demo/input/input.h"
-#include "demo/entities/entity_types.h"
-#include "demo/entities/sign.h"
-#include "demo/entities/sign_dialog.h"
-#include "demo/util/sprite.h"
+#include "input/input.h"
+#include "entities/entity_types.h"
+#include "entities/sign.h"
+#include "entities/sign_dialog.h"
+#include "util/sprite.h"
 
 #include "common/dialog.h"
 #include "common/util.h"

@@ -3,7 +3,7 @@
 
 // This file contains input handler callback functions.
 
-#include "crumbs.h"
+#include "demo.h"
 
 void demo_root_input(cr_app *);
 void demo_fish_menu_input(cr_app *);
