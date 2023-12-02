@@ -29,7 +29,7 @@ LINK_DIR=/LIBPATH:"$(SDL2_HOME)\lib" /LIBPATH:"."
 SRC=..\..\..\impl\*.c
 LIBS="SDL2.lib" "SDL2main.lib" "SDL2_ttf.lib" "SDL2_image.lib" "SDL2_mixer.lib" "kernel32.lib" "user32.lib" "shell32.lib"
 
-DEBUG_CFLAGS=/JMC /permissive- /ifcOutput "./" /GS /W3 /Zc:wchar_t /ZI /Gm- /Od /sdl /Fd"vc143.pdb" /Zc:inline /fp:precise /D "_DEBUG" /D "CRUMBS_EXPORTS" /D "_WINDOWS" /D "_USRDLL" /D "_WINDLL" /D "_UNICODE" /D "UNICODE" /errorReport:prompt /WX- /Zc:forScope /RTC1 /Gd /LDd /FC /EHsc /nologo /Fo"./" /Fp"x64\Debug\crumbs.pch" /diagnostics:column 
+DEBUG_CFLAGS=/JMC /permissive- /ifcOutput "./" /GS /W3 /Zc:wchar_t /ZI /Gm- /Od /sdl /Fd"vc143.pdb" /Zc:inline /fp:precise /D "_DEBUG" /D "CR_DEBUG" /D "CRUMBS_EXPORTS" /D "_WINDOWS" /D "_USRDLL" /D "_WINDLL" /D "_UNICODE" /D "UNICODE" /errorReport:prompt /WX- /Zc:forScope /RTC1 /Gd /LDd /FC /EHsc /nologo /Fo"./" /Fp"x64\Debug\crumbs.pch" /diagnostics:column 
 DEBUG_LFLAGS=/OUT:"crumbs.dll" /MANIFEST /NXCOMPAT /PDB:"crumbs.pdb" /DYNAMICBASE $(LIBS) /IMPLIB:"crumbs.lib" /DEBUG /DLL /MACHINE:X64 /INCREMENTAL /SUBSYSTEM:WINDOWS /MANIFESTUAC:NO /ManifestFile:"crumbs.dll.intermediate.manifest" /LTCGOUT:"crumbs.iobj" /ERRORREPORT:PROMPT /ILK:"crumbs.ilk" /NOLOGO /TLBID:1 
 
 CFLAGS=/permissive- /ifcOutput "./" /GS /GL /W3 /Gy /Zc:wchar_t /Zi /Gm- /O2 /sdl /Zc:inline /fp:precise /D "NDEBUG" /D "CRUMBS_EXPORTS" /D "_WINDOWS" /D "_USRDLL" /D "_WINDLL" /D "_UNICODE" /D "UNICODE" /errorReport:prompt /WX- /Zc:forScope /Gd /Oi /LD /FC /EHsc /nologo /Fo"./" /diagnostics:column 

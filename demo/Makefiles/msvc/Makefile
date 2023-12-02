@@ -4,8 +4,18 @@
 
 CC=cl
 
-INCLUDE_DIR=/I$(SDL2_HOME)\include /I$(CRUMBS_HOME)\include /I..\..
+INCLUDE_DIR=/I$(SDL2_HOME)\include /I..\.. /I$(CRUMBS_HOME)\include
+# Local development
+# /I..\..\..\..
+# Release development
+# /I$(CRUMBS_HOME)\include
+
+
 LINK_DIR=/LIBPATH:"$(SDL2_HOME)\lib" /LIBPATH:"$(CRUMBS_HOME)\lib"
+# Local development
+# /LIBPATH:"."
+# Release development
+# /LIBPATH:"$(CRUMBS_HOME)\lib"
 
 CFLAGS=/W3 /WX
 LIBS="crumbs.lib" "SDL2.lib" "SDL2main.lib" "SDL2_ttf.lib" "SDL2_image.lib" "SDL2_mixer.lib" "kernel32.lib" "user32.lib" "shell32.lib"
@@ -22,4 +32,4 @@ all:
 	del *.obj
 
 debug:
-	$(CC) /JMC $(CFLAGS) /D"_DEBUG" $(MAIN_DEF) $(INCLUDE_DIR) $(SRC) /link $(LIBS) $(LINK_DIR) /SUBSYSTEM:CONSOLE -out:demo.exe
+	$(CC) /JMC $(CFLAGS) /D"_DEBUG" /D"CR_DEBUG" $(MAIN_DEF) $(INCLUDE_DIR) $(SRC) /link $(LIBS) $(LINK_DIR) /SUBSYSTEM:CONSOLE -out:demo.exe

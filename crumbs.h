@@ -173,6 +173,8 @@ typedef int (*cr_interaction)(
     cr_entity *,
     cr_entity *);
 
+typedef struct cr_config cr_config;
+
 //----------------------------------------------------------------------------
 // Structure Definitions
 
@@ -455,8 +457,23 @@ struct cr_entity_type
     int slope;        // entity is a sloped platform
 };
 
+#define CR_SCALE_FIXED 1
+#define CR_SCALE_ASPECT_RATIO 2
+#define CR_SCALE_STRETCH 3
+
+struct cr_config
+{
+    const char* title;
+    int window_width;
+    int window_height;
+    float scale;
+    int scale_mode;
+};
+
 //----------------------------------------------------------------------------
 // Core Functions
+
+CRUMBS_API const char* CRUMBS_CALL cr_version();
 
 /**
  * Initializes the framework.
@@ -496,6 +513,8 @@ CRUMBS_API void CRUMBS_CALL cr_destroy_app(cr_app *);
  * underlying platform to label the window.
  */
 CRUMBS_API void CRUMBS_CALL cr_set_title(cr_app *, const char *);
+
+CRUMBS_API void CRUMBS_CALL cr_configure(cr_config*);
 
 /**
  * Initiates the current frame.

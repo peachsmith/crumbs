@@ -5,7 +5,16 @@
 CC=gcc
 
 INCLUDE_DIR=-I../.. -I"$(CRUMBS_HOME)/mingw/include"
+# Local development
+# -I../../../..
+# Release development
+# -I"$(CRUMBS_HOME)/mingw/include"
+
 LINK_DIR=-L"$(CRUMBS_HOME)/mingw/lib"
+# Local development
+# -L.
+# Release development
+# -L"$(CRUMBS_HOME)/mingw/lib"
 
 CFLAGS=-Wall -Werror
 LIBS=-lmingw32 -lcrumbs -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer

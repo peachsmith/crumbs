@@ -15,6 +15,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 // maximum number of characters in a font atlas
 #define FONT_ATLAS_MAX 128
@@ -239,5 +240,13 @@ void cr_impl_play_sound(cr_app *, cr_sound *);
  *   cr_sound* - a pointer to a sound
  */
 void cr_impl_destroy_sound(cr_sound *);
+
+void cr__log(const char*, ...);
+
+#ifdef CR_DEBUG
+#define CR_LOG cr__log
+#else
+#define CR_LOG
+#endif
 
 #endif

@@ -1,9 +1,31 @@
 #include "impl.h"
 
-static cr_impl *create_impl(int screen_width, int screen_height, int scale);
+static const char *version = "1.1.0";
+
+static cr_config g_config = {
+    .scale = 1,
+    .scale_mode = CR_SCALE_FIXED,
+    .title = "Crumbs",
+    .window_width = CR_DEFAULT_SCREEN_WIDTH,
+    .window_height = CR_DEFAULT_SCREEN_HEIGHT};
+
+static cr_impl *create_impl(int screen_width, int screen_height, float scale);
+
+void cr__log(const char *msg, ...)
+{
+    va_list args;
+    va_start(args, msg);
+    vfprintf(stdout, msg, args);
+    va_end(args);
+}
 
 //----------------------------------------------------------------------------
 // core functions
+
+const char *cr_version()
+{
+    return version;
+}
 
 int cr_initialize()
 {
@@ -74,19 +96,16 @@ void cr_terminate()
     SDL_Quit();
 }
 
-// default update function
 static void default_update(cr_app *app)
 {
 }
 
-// default draw function
 static void default_draw(cr_app *app)
 {
 }
 
 cr_app *cr_create_app()
 {
-    int default_scale = 3;
     cr_app *app = NULL;
 
     // Create the app struct.
@@ -100,7 +119,7 @@ cr_app *cr_create_app()
     app->impl = create_impl(
         CR_DEFAULT_SCREEN_WIDTH,
         CR_DEFAULT_SCREEN_HEIGHT,
-        default_scale);
+        g_config.scale);
     if (app->impl == NULL)
     {
         printf("failed to create impl\n");
@@ -126,7 +145,7 @@ cr_app *cr_create_app()
 
     app->origin_x = 0;
     app->origin_y = 0;
-    app->scale = default_scale;
+    app->scale = g_config.scale;
     app->time = TIMING_DELTA;
     app->done = 0;
     app->pause = 0;
@@ -233,9 +252,108 @@ void cr_set_title(cr_app *app, const char *title)
     SDL_SetWindowTitle(impl->window, title);
 }
 
+void cr_configure(cr_config *config)
+{
+    g_config.title = config->title;
+    g_config.scale = config->scale;
+    g_config.scale_mode = config->scale_mode;
+    g_config.window_width = config->window_width;
+    g_config.window_height = config->window_height;
+}
+
+static void high_dpi_correction(cr_app *app, float scale_x, float scale_y)
+{
+    int ww, wh;
+    int rw, rh;
+    SDL_GetWindowSize(app->impl->window, &ww, &wh);
+    SDL_GetRendererOutputSize(app->impl->renderer, &rw, &rh);
+    if (rw > ww)
+    {
+        int scale_correction_x = rw / ww;
+        int scale_correction_y = rh / wh;
+        SDL_RenderSetScale(app->impl->renderer, (float)scale_correction_x * g_config.scale, (float)scale_correction_y * g_config.scale);
+    }
+    else if (app->scale > 0)
+    {
+        SDL_RenderSetScale(
+            app->impl->renderer,
+            scale_x ? scale_x : (float)app->scale,
+            scale_y ? scale_y : (float)app->scale);
+    }
+}
+
+static void resize_scale_fixed(Sint32 d1, Sint32 d2, cr_app *app)
+{
+    cr_impl *impl = app->impl;
+    int dsx = d1 / app->screen_width ? d1 / app->screen_width : -(app->screen_width / d1);
+    int dsy = d2 / app->screen_height ? d2 / app->screen_height : -(app->screen_height / d2);
+
+    if (!dsx || !dsy)
+    {
+        return;
+    }
+
+    // Center the screen.
+    app->origin_x = d1 < app->screen_width ? 0 : ((d1 - (app->screen_width * app->scale)) / app->scale) / 2;
+    app->origin_y = d2 < app->screen_height ? 0 : ((d2 - (app->screen_height * app->scale)) / app->scale) / 2;
+
+    high_dpi_correction(app, 0, 0);
+}
+
+static void resize_scale_aspect_ratio(Sint32 d1, Sint32 d2, cr_app *app)
+{
+    cr_impl *impl = app->impl;
+    int dsx = d1 / app->screen_width ? d1 / app->screen_width : -(app->screen_width / d1);
+    int dsy = d2 / app->screen_height ? d2 / app->screen_height : -(app->screen_height / d2);
+
+    if (!dsx || !dsy)
+    {
+        return;
+    }
+
+    int grow_factor = dsx < dsy ? dsx : dsy;
+    grow_factor = grow_factor >= 0 ? grow_factor : 1;
+    SDL_RenderSetScale(impl->renderer, (float)(grow_factor), (float)(grow_factor));
+    app->scale = grow_factor;
+
+    // Center the screen.
+    app->origin_x = d1 < app->screen_width ? 0 : ((d1 - (app->screen_width * app->scale)) / app->scale) / 2;
+    app->origin_y = d2 < app->screen_height ? 0 : ((d2 - (app->screen_height * app->scale)) / app->scale) / 2;
+
+    high_dpi_correction(app, 0, 0);
+}
+
+static void resize_scale_stretch(Sint32 d1, Sint32 d2, cr_app *app)
+{
+    cr_impl *impl = app->impl;
+    float stretch_factor_x = ((float)d1 / app->screen_width) > 0 ? ((float)d1 / app->screen_width) : -(app->screen_width / (float)d1);
+    float stretch_factor_y = ((float)d2 / app->screen_height) > 0 ? ((float)d2 / app->screen_height) : -(app->screen_height / (float)d2);
+
+    SDL_RenderSetScale(impl->renderer, stretch_factor_x, stretch_factor_y);
+
+    high_dpi_correction(app, stretch_factor_x, stretch_factor_y);
+}
+
+static void handle_resize(Sint32 d1, Sint32 d2, cr_app *app)
+{
+    switch (g_config.scale_mode)
+    {
+    case CR_SCALE_ASPECT_RATIO:
+        resize_scale_aspect_ratio(d1, d2, app);
+        break;
+    case CR_SCALE_FIXED:
+        resize_scale_fixed(d1, d2, app);
+        break;
+    case CR_SCALE_STRETCH:
+        resize_scale_stretch(d1, d2, app);
+        break;
+    default:
+        break;
+    }
+}
+
 void cr_begin_frame(cr_app *app)
 {
-    // cr_impl_process_events(app);
     if (app == NULL || app->impl == NULL)
     {
         return;
@@ -253,8 +371,6 @@ void cr_begin_frame(cr_app *app)
     Uint64 count = SDL_GetPerformanceCounter();
     impl->timing.delta = (float)(count - impl->timing.count) / impl->timing.frequency;
     impl->timing.count = count;
-
-    int dsx = 0, dsy = 0;
 
     // According to the wiki, it is common practice to process all events in
     // the event queue at the beginning of each iteration of the main loop.
@@ -274,40 +390,7 @@ void cr_begin_frame(cr_app *app)
         {
             Sint32 d1 = impl->event.window.data1;
             Sint32 d2 = impl->event.window.data2;
-
-            dsx = d1 / app->screen_width ? d1 / app->screen_width : -(app->screen_width / d1);
-            dsy = d2 / app->screen_height ? d2 / app->screen_height : -(app->screen_height / d2);
-
-            // Determine if we should change the scale.
-            if (dsx && dsy)
-            {
-                int grow_factor = dsx < dsy ? dsx : dsy;
-                grow_factor = grow_factor >= 0 ? grow_factor : 1;
-                SDL_RenderSetScale(impl->renderer, (float)(grow_factor), (float)(grow_factor));
-                app->scale = grow_factor;
-
-                // Attempt to center the screen.
-                // If the whole screen cannot fit within the window, set the
-                // origin to (0, 0).
-                app->origin_x = d1 < app->screen_width ? 0 : ((d1 - (app->screen_width * app->scale)) / app->scale) / 2;
-                app->origin_y = d2 < app->screen_height ? 0 : ((d2 - (app->screen_height * app->scale)) / app->scale) / 2;
-
-                // Correct the scale for high DPI monitors.
-                int ww, wh;
-                int rw, rh;
-                SDL_GetWindowSize(app->impl->window, &ww, &wh);
-                SDL_GetRendererOutputSize(app->impl->renderer, &rw, &rh);
-                if (rw > ww)
-                {
-                    int scale_correction_x = rw / ww;
-                    int scale_correction_y = rh / wh;
-                    SDL_RenderSetScale(app->impl->renderer, (float)scale_correction_x * app->scale, (float)scale_correction_y * app->scale);
-                }
-                else if (app->scale > 0)
-                {
-                    SDL_RenderSetScale(app->impl->renderer, (float)app->scale, (float)app->scale);
-                }
-            }
+            handle_resize(d1, d2, app);
         }
 
         // If we have any textures that are render targets, they will
@@ -727,7 +810,7 @@ void cr_play_sound(cr_app *app, cr_sound *sound)
     cr_impl_play_sound(app, sound);
 }
 
-static cr_impl *create_impl(int screen_width, int screen_height, int scale)
+static cr_impl *create_impl(int screen_width, int screen_height, float scale)
 {
     cr_impl *impl;
     SDL_Window *window;
@@ -744,11 +827,11 @@ static cr_impl *create_impl(int screen_width, int screen_height, int scale)
     // Create the window.
     // NOTE: we use SDL_WINDOW_ALLOW_HIGHDPI on macOS.
     window = SDL_CreateWindow(
-        "Example",
+        g_config.title,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        screen_width * scale,
-        screen_height * scale,
+        g_config.window_width,
+        g_config.window_height,
         SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     if (window == NULL)
     {
@@ -781,19 +864,19 @@ static cr_impl *create_impl(int screen_width, int screen_height, int scale)
     int rw, rh;
     SDL_GetWindowSize(window, &ww, &wh);
     SDL_GetRendererOutputSize(renderer, &rw, &rh);
-    printf("[DEBUG] window: (%d x %d), renderer: (%d, %d)\n", ww, wh, rw, rh);
+    CR_LOG("[DEBUG] window: (%d x %d), renderer: (%d, %d)\n", ww, wh, rw, rh);
     if (rw > ww)
     {
         int scale_correction_x = rw / ww;
         int scale_correction_y = rh / wh;
-        printf("[DEBUG] scale correction factor: (%d, %d)\n",
+        CR_LOG("[DEBUG] scale correction factor: (%d, %d)\n",
                scale_correction_x,
                scale_correction_y);
         SDL_RenderSetScale(renderer, (float)scale_correction_x * scale, (float)scale_correction_y * scale);
     }
     else if (scale > 0)
     {
-        SDL_RenderSetScale(renderer, (float)scale, (float)scale);
+        SDL_RenderSetScale(renderer, scale, scale);
     }
 
     // Get the keyboard state.
@@ -825,15 +908,15 @@ static cr_impl *create_impl(int screen_width, int screen_height, int scale)
     SDL_RendererInfo ri;
     if (!SDL_GetRendererInfo(impl->renderer, &ri))
     {
-        printf("[DEBUG] Renderer Info\n-------------\n");
-        printf("[DEBUG] Name: %s\n", ri.name);
-        printf("[DEBUG] Number of texture formats: %d\n", ri.num_texture_formats);
-        printf("[DEBUG] Max Width: %d\n", ri.max_texture_width);
-        printf("[DEBUG] Max Height: %d\n", ri.max_texture_height);
-        printf("[DEBUG] SDL_RENDERER_SOFTWARE: %s\n", (ri.flags & SDL_RENDERER_SOFTWARE) ? "yes" : "no");
-        printf("[DEBUG] SDL_RENDERER_ACCELERATED: %s\n", (ri.flags & SDL_RENDERER_ACCELERATED) ? "yes" : "no");
-        printf("[DEBUG] SDL_RENDERER_PRESENTVSYNC: %s\n", (ri.flags & SDL_RENDERER_PRESENTVSYNC) ? "yes" : "no");
-        printf("[DEBUG] SDL_RENDERER_TARGETTEXTURE: %s\n", (ri.flags & SDL_RENDERER_TARGETTEXTURE) ? "yes" : "no");
+        CR_LOG("[DEBUG] Renderer Info\n-------------\n");
+        CR_LOG("[DEBUG] Name: %s\n", ri.name);
+        CR_LOG("[DEBUG] Number of texture formats: %d\n", ri.num_texture_formats);
+        CR_LOG("[DEBUG] Max Width: %d\n", ri.max_texture_width);
+        CR_LOG("[DEBUG] Max Height: %d\n", ri.max_texture_height);
+        CR_LOG("[DEBUG] SDL_RENDERER_SOFTWARE: %s\n", (ri.flags & SDL_RENDERER_SOFTWARE) ? "yes" : "no");
+        CR_LOG("[DEBUG] SDL_RENDERER_ACCELERATED: %s\n", (ri.flags & SDL_RENDERER_ACCELERATED) ? "yes" : "no");
+        CR_LOG("[DEBUG] SDL_RENDERER_PRESENTVSYNC: %s\n", (ri.flags & SDL_RENDERER_PRESENTVSYNC) ? "yes" : "no");
+        CR_LOG("[DEBUG] SDL_RENDERER_TARGETTEXTURE: %s\n", (ri.flags & SDL_RENDERER_TARGETTEXTURE) ? "yes" : "no");
     }
 
     return impl;

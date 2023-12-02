@@ -232,8 +232,6 @@ static void draw(cr_app *app)
 
 int demo_init_app(cr_app *app)
 {
-    cr_set_title(app, "Demo");
-
     // default values for entity types
     for (int i = 0; i < ENTITY_TYPE_MAX; i++)
     {
