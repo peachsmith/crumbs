@@ -4,7 +4,7 @@
 
 CC=clang
 
-INCLUDE_DIR=-I/Library/Frameworks/SDL2.framework/Headers -I../.. -I../../..
+INCLUDE_DIR=-I/Library/Frameworks/SDL2.framework/Headers -I../.. -I../../../..
 LINK_DIR=-F/Library/Frameworks -L../../../impl/Makefiles/mac
 
 CFLAGS=-Wall -Werror
@@ -21,4 +21,4 @@ all:
 	$(CC) $(MAIN_DEF) $(SRC) -o demo.out $(INCLUDE_DIR) $(LINK_DIR) $(LIBS) -lcrumbs
 
 debug:
-	$(CC) -g $(MAIN_DEF) $(SRC) -o demo.out $(INCLUDE_DIR) $(LINK_DIR) $(LIBS) -lcrumbs
+	$(CC) -g $(MAIN_DEF) -DCR_DEBUG $(SRC) -o demo.out $(INCLUDE_DIR) $(LINK_DIR) $(LIBS) -lcrumbs

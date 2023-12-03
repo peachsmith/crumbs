@@ -241,12 +241,4 @@ void cr_impl_play_sound(cr_app *, cr_sound *);
  */
 void cr_impl_destroy_sound(cr_sound *);
 
-void cr__log(const char*, ...);
-
-#ifdef CR_DEBUG
-#define CR_LOG cr__log
-#else
-#define CR_LOG
-#endif
-
 #endif
