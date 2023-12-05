@@ -147,8 +147,8 @@ cr_app *cr_create_app()
     app->entity_cap = 0;
 
     // screen dimensions
-    app->screen_width = CR_DEFAULT_SCREEN_WIDTH;
-    app->screen_height = CR_DEFAULT_SCREEN_HEIGHT;
+    app->screen_width = g_config.window_width;   // CR_DEFAULT_SCREEN_WIDTH;
+    app->screen_height = g_config.window_height; // CR_DEFAULT_SCREEN_HEIGHT;
 
     // camera
     app->cam.x = 0;
