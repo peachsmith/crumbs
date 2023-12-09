@@ -3,7 +3,7 @@
 #include "draw.h"
 #include "input.h"
 
-#include <windows.h>
+#include "pe.h"
 
 static cr_entity entities[PENUT_MAX_ENTITIES];
 static cr_func input_handlers[PENUT_MAX_INPUT_HANDLERS];
@@ -146,27 +146,6 @@ static void draw(cr_app *app)
         10);
 }
 
-FILE *open_file(const char *name, const char *mode)
-{
-    FILE *f;
-
-#if (defined(__STDC_LIB_EXT1__) && __STDC_WANT_LIB_EXT1__ == 1) || \
-    (defined(_WIN32) && !defined(_CRT_SECURE_NO_WARNINGS))
-    if (fopen_s(&f, name, mode))
-    {
-        return NULL;
-    }
-#else
-    f = fopen(name, mode);
-    if (f == NULL)
-    {
-        return NULL;
-    }
-#endif
-
-    return f;
-}
-
 int penut_init_app(cr_app *app)
 {
     for (int i = 0; i < ENTITY_TYPE_MAX; i++)
@@ -237,76 +216,7 @@ int penut_init_app(cr_app *app)
 
     cr_push_input_handler(app, penut_root_input);
 
-    printf("opening PE file\n");
-    FILE *pe_file = open_file("hello.exe", "rb");
-    if (pe_file == NULL)
-    {
-        fprintf(stderr, "failed to open executable file\n");
-        return 0;
-    }
-
-    // PE sections:
-    // MS-DOS Stub
-    //   A small program inserted by the linker
-    //   At location 0x3C, the stub contains the location of the signature
-    //
-    // Signature
-    //   Located at the offset specified at 0x3C.
-    //   Four bytes "PE\0\0"
-    //
-    // COFF File Header
-    //   Immediately after the signature
-    //   Offset Size   Field Description
-    //   0      2      Machine
-    //   2      2      NumberOfSections
-    //   4      4      TimeDateStamp
-    //   8      4      PointerToSymbolTable
-    //   12     4      NumberOfSymbols
-    //   16     2      SizeOfOptionalHeader
-    //   18     2      Characteristics
-    //
-    LONG sigLoc;
-    char sig[4];
-
-    // signature location
-    fseek(pe_file, 0x3C, SEEK_SET);
-    fread(&sigLoc, sizeof(LONG), 1, pe_file);
-    printf("signature offset: %ld\n", sigLoc);
-
-    // signature
-    fseek(pe_file, sigLoc, SEEK_SET);
-    fread(sig, sizeof(char), 4, pe_file);
-    if (sig[0] != 'P' || sig[1] != 'E' || sig[2] != '\0' || sig[3] != '\0')
-    {
-        fprintf(stderr, "failed to read PE signature\n");
-        fclose(pe_file);
-        return 1;
-    }
-    printf("signature: %s\n", sig);
-
-    // COFF header
-    unsigned char coff[20];
-    fread(coff, sizeof(unsigned char), 20, pe_file);
-    unsigned int machine_type = (((int)(coff[1]) << 8) | coff[0]);
-    unsigned int num_sections = (((int)(coff[3]) << 8) | coff[2]);
-    unsigned int time_date_stamp = (((int)(coff[7]) << 24) | ((int)(coff[6]) << 16) | ((int)(coff[5]) << 8) | coff[4]);
-    unsigned int symbol_pointer = (((int)(coff[11]) << 24) | ((int)(coff[10]) << 16) | ((int)(coff[9]) << 8) | coff[8]);
-    unsigned int num_symbols = (((int)(coff[15]) << 24) | ((int)(coff[14]) << 16) | ((int)(coff[13]) << 8) | coff[12]);
-    unsigned int opt_header_size = (((int)(coff[17]) << 8) | coff[16]);
-    unsigned int characteristics = (((int)(coff[19]) << 8) | coff[18]);
-
-    printf("Machine: %X\n", machine_type);
-    printf("NumberOfSections: %X\n", num_sections);
-    printf("TimeDateStamp: %u\n", time_date_stamp);
-    printf("PointerToSymbolTable: %u\n", symbol_pointer); // should be 0 because COFF debugging information is deprecated
-    printf("NumberOfSymbols: %u\n", num_symbols);         // should be 0 because COFF debugging information is deprecated
-    printf("SizeOfOptionalHeader: %u\n", opt_header_size);
-    printf("Executable: %s\n", characteristics & IMAGE_FILE_EXECUTABLE_IMAGE ? "yes" : "no");
-    printf("DLL: %s\n", characteristics & IMAGE_FILE_DLL ? "yes" : "no");
-
-    printf("finished reading PE file\n");
-    printf("closing PE file\n");
-    fclose(pe_file);
+    penut_open("hello.exe");
 
     return 1;
 }
